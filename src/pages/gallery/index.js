@@ -2,248 +2,317 @@ import React, { useState, useEffect } from 'react';
 import Layout from '../../components/layout';
 
 const ProjectGallery = () => {
-  const [filter, setFilter] = useState('all');
-  
-  // This would normally use a library like Isotope.js for filtering
-  // This is a simplified version for demonstration
-  const handleFilterClick = (category) => {
-    setFilter(category);
-  };
-  
-  const projects = [
-    {
-      id: 1,
-      title: "Planting",
-      description: "Together also created. Meat winged seas waters herb saw he. Second female void.",
-      image: "assets/images/our-project/project_1.jpg",
-      popupImage: "assets/images/our-project/project_1.jpg",
-      category: "category1",
-      categories: ["all", "category1"]
-    },
-    {
-      id: 2,
-      title: "Planting",
-      description: "Together also created. Meat winged seas waters herb saw he. Second female void.",
-      image: "assets/images/our-project/project_3.jpg",
-      popupImage: "assets/images/our-project/project_1.jpg",
-      category: "category2",
-      categories: ["all", "category2"]
-    },
-    {
-      id: 3,
-      title: "Planting",
-      description: "Together also created. Meat winged seas waters herb saw he. Second female void.",
-      image: "assets/images/our-project/project_2.jpg",
-      popupImage: "assets/images/our-project/project_1.jpg",
-      category: "category3",
-      categories: ["all", "category3"]
-    },
-    {
-      id: 4,
-      title: "Planting",
-      description: "Together also created. Meat winged seas waters herb saw he. Second female void.",
-      image: "assets/images/our-project/project_4.jpg",
-      popupImage: "assets/images/our-project/project_1.jpg",
-      category: "category4",
-      categories: ["all", "category4"]
-    }
-  ];
-  
-  // For handling the popup functionality (you would typically use a library like react-modal)
-  const [activePopup, setActivePopup] = useState(null);
-  
-  const openPopup = (id) => {
-    setActivePopup(id);
-  };
-  
-  const closePopup = () => {
-    setActivePopup(null);
-  };
-  
-  // In a real implementation, you'd use a proper modal library and wouldn't need this
+  const [galleries, setGalleries] = useState([]);
+  const [gridItems, setGridItems] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [selectedPhoto, setSelectedPhoto] = useState(null);
+  const [activeCategory, setActiveCategory] = useState('all');
+  const [categories, setCategories] = useState([]);
+
+  // Fetch galleries
   useEffect(() => {
-    if (activePopup) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = 'unset';
-    }
-    
-    return () => {
-      document.body.style.overflow = 'unset';
+    const fetchGalleries = async () => {
+      try {
+        const res = await fetch('https://forlandservice.onrender.com/gallery');
+        const data = await res.json();
+        setGalleries(data.galleries || []);
+        
+        // Extract unique categories
+        const cats = [...new Set(data.galleries.map(g => g.category || g.title))];
+        setCategories(cats);
+      } catch (err) {
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
     };
-  }, [activePopup]);
-  
+    fetchGalleries();
+  }, []);
+
+  // Flatten photos into grid items
+  useEffect(() => {
+    let items = galleries.flatMap(gallery =>
+      gallery.photos.map((url, idx) => ({
+        id: `${gallery._id}-${idx}`,
+        url,
+        title: gallery.title,
+        category: gallery.category || gallery.title,
+        desc: gallery.description || '',
+        date: new Date(gallery.uploadedAt).toLocaleDateString(),
+      }))
+    );
+
+    // Filter by category
+    if (activeCategory !== 'all') {
+      items = items.filter(item => item.category === activeCategory);
+    }
+
+    setGridItems(items);
+  }, [galleries, activeCategory]);
+
+  const masonryStyles = `
+    .masonry-grid {
+      display: flex;
+      margin-left: -15px;
+      width: auto;
+    }
+    .masonry-column {
+      padding-left: 15px;
+      background-clip: padding-box;
+    }
+    .gallery-item {
+      margin-bottom: 15px;
+      break-inside: avoid;
+      position: relative;
+      overflow: hidden;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    .gallery-item:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    }
+    .gallery-item img {
+      width: 100%;
+      min-height: 300px;
+      height: auto;
+      display: block;
+      border-radius: 8px;
+      object-fit: cover;
+    }
+    .gallery-item-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0,0,0,0.6);
+      opacity: 0;
+      transition: opacity 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 8px;
+    }
+    .gallery-item:hover .gallery-item-overlay {
+      opacity: 1;
+    }
+    .gallery-item-overlay i {
+      color: white;
+      font-size: 32px;
+    }
+    .category-tabs-wrapper {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 50px;
+    }
+    .category-tabs {
+      display: inline-flex;
+      flex-wrap: wrap;
+      gap: 30px;
+      border-bottom: 2px solid #e0e0e0;
+      padding-bottom: 0;
+    }
+    .category-tab {
+      padding: 15px 8px;
+      background: transparent;
+      border: none;
+      border-bottom: 3px solid transparent;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-weight: 500;
+      font-size: 16px;
+      color: #666;
+      position: relative;
+      margin-bottom: -2px;
+      outline: none;
+    }
+    .category-tab:hover {
+      color: #008435;
+    }
+    .category-tab.active {
+      color: #008435;
+      border-bottom-color: #008435;
+    }
+    .skeleton-loader {
+      background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+      background-size: 200% 100%;
+      animation: loading 1.5s infinite;
+      border-radius: 8px;
+      min-height: 300px;
+    }
+    @keyframes loading {
+      0% { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
+    }
+    .load-more-btn {
+      background-color: #008435;
+      border-color: #008435;
+      border-radius: 50px;
+      padding: 12px 50px;
+      font-weight: 600;
+      transition: all 0.3s ease;
+    }
+    .load-more-btn:hover {
+      background-color: #006629;
+      border-color: #006629;
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(0,132,53,0.3);
+    }
+  `;
+
+  // Masonry layout component
+  const MasonryGrid = ({ children, columnCount = 4 }) => {
+    const columns = Array.from({ length: columnCount }, () => []);
+    
+    React.Children.forEach(children, (child, index) => {
+      columns[index % columnCount].push(child);
+    });
+
+    return (
+      <div className="masonry-grid">
+        {columns.map((column, columnIndex) => (
+          <div key={columnIndex} className="masonry-column" style={{ flex: 1 }}>
+            {column}
+          </div>
+        ))}
+      </div>
+    );
+  };
+
   return (
-    <>
-      {/* Breadcrumb Section */}
-     <Layout>
-     <section className="banner-inner-sec" style={{backgroundImage: "url('assets/images/bg1.png')"}}>
+    <Layout>
+      <style>{masonryStyles}</style>
+      
+      {/* Breadcrumb */}
+      <section
+        className="banner-inner-sec"
+        style={{ backgroundImage: "url('assets/images/bg1.png')" }}
+      >
         <div className="banner-table">
           <div className="banner-table-cell">
             <div className="container">
               <div className="banner-inner-content">
                 <h2 className="banner-inner-title">Gallery</h2>
                 <ul className="xs-breadcumb">
-                  <li><a href="/"> Home  / </a> <a href="/gallery">Pages /</a>  gallery</li>
+                  <li>
+                    <a href="/">Home /</a> <a href="/gallery">Pages /</a> gallery
+                  </li>
                 </ul>
               </div>
             </div>
           </div>
         </div>
       </section>
-      
+
       {/* Gallery Section */}
-      <section className="gallery-sec recent-work-sec our-project-sec section-padding">
+      <section className="py-5">
         <div className="container">
-          <div className="row">
-            <div className="col-lg-12">
-              <div className="recent-folio-menu xs-mb-50">
-                <ul className="work-folio-menu">
-                  <li 
-                    className={`filter ${filter === 'all' ? 'active' : ''}`} 
-                    onClick={() => handleFilterClick('all')}
-                  >
-                    All
-                  </li>
-                  <li 
-                    className={`filter ${filter === 'category1' ? 'active' : ''}`}
-                    onClick={() => handleFilterClick('category1')}
-                  >
-                    Gardening
-                  </li>
-                  <li 
-                    className={`filter ${filter === 'category2' ? 'active' : ''}`}
-                    onClick={() => handleFilterClick('category2')}
-                  >
-                    Fall cleanup
-                  </li>
-                  <li 
-                    className={`filter ${filter === 'category3' ? 'active' : ''}`}
-                    onClick={() => handleFilterClick('category3')}
-                  >
-                    Watering
-                  </li>
-                  <li 
-                    className={`filter ${filter === 'category4' ? 'active' : ''}`}
-                    onClick={() => handleFilterClick('category4')}
-                  >
-                    Video
-                  </li>
-                </ul>
-              </div>
+          {/* Category Tabs */}
+          <div className="category-tabs-wrapper">
+            <div className="category-tabs">
+              <button
+                className={`category-tab ${activeCategory === 'all' ? 'active' : ''}`}
+                onClick={() => setActiveCategory('all')}
+              >
+                All
+              </button>
+              {categories.map((cat) => (
+                <button
+                  key={cat}
+                  className={`category-tab ${activeCategory === cat ? 'active' : ''}`}
+                  onClick={() => setActiveCategory(cat)}
+                >
+                  {cat}
+                </button>
+              ))}
             </div>
           </div>
-          
-          <div className="xs-portfolio-grid grid">
-            {projects
-              .filter(project => filter === 'all' || project.category === filter)
-              .map(project => (
-                <div key={project.id} className={`xs-portfolio-grid-item ${project.category} grid-item all`}>
-                  <a 
-                    href={`#popup_${project.id}`} 
-                    className="xs-single-portfolio-item xs-image-popup"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      openPopup(project.id);
-                    }}
-                  >
-                    <img src={project.image} alt={project.title} />
-                    <div className="single-project-content">
-                      <div className="xs-image-popup-icon">
-                        <i className="icon icon-plus"></i>
-                      </div>
-                      <h3 className="xs-single-title">{project.title}</h3>
-                      <p>{project.description}</p>
-                    </div>
-                  </a>
-                  
-                  {/* Popup Content */}
-                  {activePopup === project.id && (
-                    <div className="popup-overlay" onClick={closePopup}>
-                      <div 
-                        id={`popup_${project.id}`} 
-                        className="container xs-gallery-popup-item"
-                        onClick={(e) => e.stopPropagation()}
-                      >
-                        <div className="row">
-                          <div className="col-lg-5 xs-padding-0">
-                            <div className="xs-popup-img">
-                              <img src={project.popupImage} alt={project.title} />
-                            </div>
-                          </div>
-                          <div className="col-lg-7">
-                            <div className="xs-popup-content">
-                              <h2 className="hidden-title">Project info</h2>
-                              <h3>Garden Caring</h3>
-                              <div className="row">
-                                <div className="col-lg-5">
-                                  <ul className="xs-popup-left-content">
-                                    <li>
-                                      <i className="icon icon-calendar-full"></i>
-                                      <label>Project date</label>
-                                      <span>22 jan 2018</span>
-                                    </li>
-                                    <li>
-                                      <i className="icon icon-tags"></i>
-                                      <label>Category</label>
-                                      <span>Garden care, Garden</span>
-                                    </li>
-                                    <li>
-                                      <i className="icon icon-user2"></i>
-                                      <label>Client</label>
-                                      <span>Mr. Jordan, Newyork</span>
-                                    </li>
-                                    <li>
-                                      <i className="icon icon-invest"></i>
-                                      <label>Project value</label>
-                                      <span>$ 500</span>
-                                    </li>
-                                    <li>
-                                      <i className="icon icon-map-marker2"></i>
-                                      <label>Location</label>
-                                      <span>76/A, Green lawn, Newyork City</span>
-                                    </li>
-                                  </ul>
-                                </div>
-                                <div className="col-lg-7">
-                                  <div className="xs-popup-right-content">
-                                    <p>
-                                      Darkness dominion dominion her body creature appear make replenish.
-                                      Bring shall him waters saw creepeth creepeth land divided.
-                                    </p>
-                                    <blockquote>
-                                      "Each which life god all living form fruitful their fowl shed a stars he left"
-                                    </blockquote>
-                                    <p>
-                                      Fowl she'd a stars he let. Creepeth deep sixth you is signs creature.
-                                      Earth divide great whales.
-                                    </p>
-                                    <a href="#" className="xs-btn">PROJECT LINK</a>
-                                    <button className="close-popup" onClick={closePopup}>×</button>
-                                  </div>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  )}
+
+          {/* Masonry Grid */}
+          {loading ? (
+            <MasonryGrid columnCount={4}>
+              {[...Array(12)].map((_, i) => (
+                <div key={i} className="gallery-item">
+                  <div className="skeleton-loader"></div>
                 </div>
               ))}
-          </div>
-          
-          <div className="row">
-            <div className="col-lg-12">
-              <div className="load-more-btn">
-                <a href="#" className="xs-btn">More View</a>
+            </MasonryGrid>
+          ) : gridItems.length === 0 ? (
+            <div className="text-center py-5">
+              <p className="text-muted">No photos found in this category</p>
+            </div>
+          ) : (
+            <MasonryGrid columnCount={4}>
+              {gridItems.map((item) => (
+                <div
+                  key={item.id}
+                  className="gallery-item"
+                  data-toggle="modal"
+                  data-target="#photoModal"
+                  onClick={() => setSelectedPhoto(item)}
+                >
+                  <img src={item.url} alt={item.title} />
+                  <div className="gallery-item-overlay">
+                    <i className="fas fa-search-plus"></i>
+                  </div>
+                </div>
+              ))}
+            </MasonryGrid>
+          )}
+
+          {/* Load More */}
+          {!loading && gridItems.length > 0 && (
+            <div className="text-center mt-5">
+              <button className="btn btn-primary btn-lg load-more-btn">
+                Load More
+              </button>
+            </div>
+          )}
+        </div>
+      </section>
+
+      {/* Bootstrap Modal */}
+      {selectedPhoto && (
+        <div
+          className="modal fade"
+          id="photoModal"
+          tabIndex={-1}
+          role="dialog"
+          aria-hidden="true"
+        >
+          <div className="modal-dialog modal-lg modal-dialog-centered" role="document">
+            <div className="modal-content" style={{ borderRadius: '8px', overflow: 'hidden' }}>
+              <div className="modal-body p-0">
+                <button
+                  type="button"
+                  className="close position-absolute"
+                  data-dismiss="modal"
+                  aria-label="Close"
+                  style={{ right: '15px', top: '10px', zIndex: 1, color: 'white', textShadow: '0 0 5px rgba(0,0,0,0.5)', fontSize: '2rem' }}
+                >
+                  <span aria-hidden="true">&times;</span>
+                </button>
+                <img
+                  src={selectedPhoto.url}
+                  className="w-100"
+                  alt={selectedPhoto.title}
+                  style={{ maxHeight: '80vh', objectFit: 'contain', background: '#000' }}
+                />
+              </div>
+              <div className="modal-footer" style={{ background: '#f8f9fa' }}>
+                <div className="w-100">
+                  <h5 className="mb-2">{selectedPhoto.title}</h5>
+                  <p className="text-muted mb-2">{selectedPhoto.desc}</p>
+                  <small className="text-muted">{selectedPhoto.date}</small>
+                </div>
               </div>
             </div>
           </div>
         </div>
-      </section>
-     </Layout>
-    </>
+      )}
+    </Layout>
   );
 };
 
