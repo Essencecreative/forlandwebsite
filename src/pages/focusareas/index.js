@@ -1,5 +1,6 @@
 import React from 'react';
 import Layout from '../../components/layout';
+import BannerHeader from '../../components/BannerHeader';
 import { Helmet } from 'react-helmet-async';
 
 const Focusareas = () => {
@@ -10,23 +11,7 @@ const Focusareas = () => {
         <title>Focus Areas- FORLAND</title>
         </Helmet>
       {/* Breadcrumb Banner Section */}
-      <section 
-        className="banner-inner-sec" 
-        style={{backgroundImage: "url('assets/images/bg1.png')"}}
-      >
-        <div className="banner-table">
-          <div className="banner-table-cell">
-            <div className="container">
-              <div className="banner-inner-content">
-                <h2 className="banner-inner-title">Focus Areas</h2>
-                <ul className="xs-breadcumb">
-                  <li><a href="/"> Home / </a> Focus Areas</li>
-                </ul>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
+      <BannerHeader title="Focus Areas" breadcrumb="Focus Areas" />
 
       {/* About Company Section */}
       {/* <section className="about-inner section-padding">

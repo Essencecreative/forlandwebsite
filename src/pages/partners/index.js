@@ -1,5 +1,6 @@
 import React from 'react';
 import Layout from '../../components/layout';
+import BannerHeader from '../../components/BannerHeader';
 import { Helmet } from 'react-helmet-async';
 
 const Partners = () => {
@@ -10,23 +11,7 @@ const Partners = () => {
         <title>Partners - FORLAND</title>
         </Helmet>
       {/* Breadcrumb Banner Section */}
-      <section 
-        className="banner-inner-sec" 
-        style={{backgroundImage: "url('assets/images/bg1.png')"}}
-      >
-        <div className="banner-table">
-          <div className="banner-table-cell">
-            <div className="container">
-              <div className="banner-inner-content">
-                <h2 className="banner-inner-title">Partners & Collaborators</h2>
-                <ul className="xs-breadcumb">
-                  <li><a href="/"> Home / </a>Partners & Collaborators</li>
-                </ul>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
+      <BannerHeader title="Partners & Collaborators" breadcrumb="Partners & Collaborators" />
 
       <section 
         className="ready-to-contact2 section-padding" 

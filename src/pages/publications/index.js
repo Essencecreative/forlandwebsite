@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import Layout from '../../components/layout';
+import BannerHeader from '../../components/BannerHeader';
 import { Helmet } from 'react-helmet-async';
 import Skeleton from 'react-loading-skeleton';
 import 'react-loading-skeleton/dist/skeleton.css'; // Install if not yet: npm install react-loading-skeleton
@@ -61,20 +62,7 @@ const Publications = ({
       </Helmet>
 
       <div className="publications-page">
-        <section className="banner-inner-sec" style={{ backgroundImage: `url('${bannerImage}')` }}>
-          <div className="banner-table">
-            <div className="banner-table-cell">
-              <div className="container">
-                <div className="banner-inner-content">
-                  <h2 className="banner-inner-title">{title}</h2>
-                  <ul className="xs-breadcumb">
-                    <li><a href="/"> Home / </a> {breadcrumb}</li>
-                  </ul>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
+        <BannerHeader title={title} breadcrumb={breadcrumb} fallbackImage={bannerImage} />
 
         <section className="xs-blog-sec section-padding">
           <div className="container-fluid" style={{ paddingLeft: 80, paddingRight: 80 }}>

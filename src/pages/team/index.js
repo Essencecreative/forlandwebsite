@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import Layout from '../../components/layout';
+import BannerHeader from '../../components/BannerHeader';
 import { Helmet } from 'react-helmet-async';
 import { Link } from 'react-router'; // Correct import for routing
 import Skeleton from 'react-loading-skeleton';
@@ -108,20 +109,7 @@ const Team = () => {
       <div className="about-us-page">
 
         {/* Breadcrumb Section */}
-        <section className="banner-inner-sec" style={{ backgroundImage: "url('assets/images/bg1.png')" }}>
-          <div className="banner-table">
-            <div className="banner-table-cell">
-              <div className="container">
-                <div className="banner-inner-content">
-                  <h2 className="banner-inner-title">Management Team</h2>
-                  <ul className="xs-breadcumb">
-                    <li><a href="/"> Home / </a>Management Team</li>
-                  </ul>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
+        <BannerHeader title="Management Team" breadcrumb="Management Team" />
 
         {/* Management Team Section */}
         <section className="team-v1-sec section-padding section-bg-v2">

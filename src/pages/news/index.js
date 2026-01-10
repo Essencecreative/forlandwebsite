@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import Layout from '../../components/layout';
+import BannerHeader from '../../components/BannerHeader';
 import { Helmet } from 'react-helmet-async';
 import Skeleton from 'react-loading-skeleton';
 import 'react-loading-skeleton/dist/skeleton.css';
@@ -70,20 +71,7 @@ const News = ({
 
       <div className="publications-page">
         {/* Banner */}
-        <section className="banner-inner-sec" style={{ backgroundImage: `url('${bannerImage}')` }}>
-          <div className="banner-table">
-            <div className="banner-table-cell">
-              <div className="container">
-                <div className="banner-inner-content">
-                  <h2 className="banner-inner-title">{pageTitle}</h2>
-                  <ul className="xs-breadcumb">
-                    <li><a href="/"> Home / </a> {pageTitle}</li>
-                  </ul>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
+        <BannerHeader title={pageTitle} breadcrumb={pageTitle} fallbackImage={bannerImage} />
 
         {/* News List */}
         <section className="xs-blog-sec latest-news-sec section-padding">

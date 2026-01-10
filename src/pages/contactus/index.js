@@ -1,5 +1,6 @@
 import React from 'react';
 import Layout from '../../components/layout';
+import BannerHeader from '../../components/BannerHeader';
 import { Helmet } from 'react-helmet-async';
 
 const ContactUs = () => {
@@ -17,26 +18,7 @@ const ContactUs = () => {
             </Helmet>
       <div className="contact-us-page">
       {/* Breadcrumb Banner Section */}
-      <section 
-        className="banner-inner-sec" 
-        style={{backgroundImage: "url('assets/images/contact-banner.jpg')"}}
-      >
-        <div className="banner-table">
-          <div className="banner-table-cell">
-            <div className="container">
-              <div className="banner-inner-content">
-                <h2 className="banner-inner-title">Contact us</h2>
-                <ul className="xs-breadcumb">
-                  <li>
-                    <a href="/"> Home / </a> 
-                    <a href="/">Pages /</a> contact
-                  </li>
-                </ul>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
+      <BannerHeader title="Contact us" breadcrumb="Pages / contact" />
 
       {/* Get in Touch Section */}
       <section className="xs-get-in-touch">
@@ -147,34 +129,40 @@ const ContactUs = () => {
       {/* Contact Information Section */}
       <section className="xs-contact-infomation xs-contact-info-1">
         <div className="container">
-          <div className="row">
+          <div className="row" style={{ display: 'flex', flexWrap: 'wrap' }}>
             {/* Address Info */}
-            <div className="col-lg-4 col-md-6">
-              <div className="contact-info-group">
+            <div className="col-lg-4 col-md-6" style={{ display: 'flex' }}>
+              <div className="contact-info-group" style={{ display: 'flex', flexDirection: 'column', width: '100%' }}>
                 <i className="icon-address"></i>
                 <h4>Visit our office</h4>
-                <span>Forestry and Wood Industries Training Centre</span>
-                <span className="text-color">Kinyanambo, Mafinga, Tanzania.</span>
+                <div style={{ flex: 1 }}>
+                  <span>Forestry and Wood Industries Training Centre</span>
+                  <span className="text-color">Kinyanambo, Mafinga, Tanzania.</span>
+                </div>
               </div>
             </div>
 
             {/* Email Info */}
-            <div className="col-lg-4 col-md-6">
-              <div className="contact-info-group">
+            <div className="col-lg-4 col-md-6" style={{ display: 'flex' }}>
+              <div className="contact-info-group" style={{ display: 'flex', flexDirection: 'column', width: '100%' }}>
                 <i className="icon-mail"></i>
                 <h4>Mail us</h4>
-                <a href="mailto:info@forland.or.tz">info@forland.or.tz</a>
-                {/* <a href="mailto:info@example.com">bdexample@gmail.com</a> */}
+                <div style={{ flex: 1 }}>
+                  <a href="mailto:info@forland.or.tz">info@forland.or.tz</a>
+                  {/* <a href="mailto:info@example.com">bdexample@gmail.com</a> */}
+                </div>
               </div>
             </div>
 
             {/* Phone Info */}
-            <div className="col-lg-4 col-md-6">
-              <div className="contact-info-group">
+            <div className="col-lg-4 col-md-6" style={{ display: 'flex' }}>
+              <div className="contact-info-group" style={{ display: 'flex', flexDirection: 'column', width: '100%' }}>
                 <i className="icon-call"></i>
                 <h4>Call us</h4>
-                <span>+255 786 165 173</span>
-                <span className="text-color">(Monday - Friday) at 9.am to 6pm</span>
+                <div style={{ flex: 1 }}>
+                  <span>+255 786 165 173</span>
+                  <span className="text-color">(Monday - Friday) at 9.am to 6pm</span>
+                </div>
               </div>
             </div>
           </div>

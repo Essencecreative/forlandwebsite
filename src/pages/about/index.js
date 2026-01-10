@@ -1,28 +1,13 @@
 import React from 'react';
 import Layout from '../../components/layout';
+import BannerHeader from '../../components/BannerHeader';
 
 const AboutUs = () => {
   return (
     <Layout>
         <div className="about-us-page">
       {/* Breadcrumb Banner Section */}
-      <section 
-        className="banner-inner-sec" 
-        style={{backgroundImage: "url('assets/images/banner/about-banner.jpg')"}}
-      >
-        <div className="banner-table">
-          <div className="banner-table-cell">
-            <div className="container">
-              <div className="banner-inner-content">
-                <h2 className="banner-inner-title">About Us</h2>
-                <ul className="xs-breadcumb">
-                  <li><a href="/"> Home / </a> About</li>
-                </ul>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
+      <BannerHeader title="About Us" breadcrumb="About" fallbackImage="assets/images/banner/about-banner.jpg" />
 
       {/* About Company Section */}
       <section className="about-inner section-padding">

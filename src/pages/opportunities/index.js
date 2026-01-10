@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import Layout from '../../components/layout';
+import BannerHeader from '../../components/BannerHeader';
 import { Helmet } from 'react-helmet-async';
 import axios from 'axios';
 import Skeleton from 'react-loading-skeleton';
@@ -50,23 +51,7 @@ const Opportunities = ({
 
       <div className="publications-page">
         {/* Banner */}
-        <section
-          className="banner-inner-sec"
-          style={{ backgroundImage: `url('${bannerImage}')` }}
-        >
-          <div className="banner-table">
-            <div className="banner-table-cell">
-              <div className="container">
-                <div className="banner-inner-content">
-                  <h2 className="banner-inner-title">{pageTitle}</h2>
-                  <ul className="xs-breadcumb">
-                    <li><a href="/"> Home / </a> {breadcrumb}</li>
-                  </ul>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
+        <BannerHeader title={pageTitle} breadcrumb={breadcrumb} fallbackImage={bannerImage} />
 
 <section className="public-notice section-padding bg-light">
   <div className="container">

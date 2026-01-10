@@ -6,7 +6,12 @@ import { ParallaxProvider, ParallaxBanner } from 'react-scroll-parallax';
       const Home = () => {
         const [isPlaying, setIsPlaying] = useState(false);
         const [newsItems, setNewsItems] = useState([]);
+        const [sliders, setSliders] = useState([]);
+        const [videos, setVideos] = useState([]);
+        const [currentVideoIndex, setCurrentVideoIndex] = useState(0);
         const [loading, setLoading] = useState(true);
+        const [slidersLoading, setSlidersLoading] = useState(true);
+        const [videosLoading, setVideosLoading] = useState(true);
         const [pagination, setPagination] = useState({
           totalCount: 0,
           totalPages: 1,
@@ -23,8 +28,8 @@ import { ParallaxProvider, ParallaxBanner } from 'react-scroll-parallax';
 
             const sortedNews = data.news
             .sort((a, b) => new Date(b.publicationDate).getTime() - new Date(a.publicationDate).getTime())
-            .slice(0, 2);
-      
+            .slice(0, 3);
+
             setNewsItems(sortedNews);
             setPagination({
               totalCount: data.totalCount,
@@ -37,18 +42,98 @@ import { ParallaxProvider, ParallaxBanner } from 'react-scroll-parallax';
             setLoading(false);
           }
         };
-      
+
+        const fetchSliders = async () => {
+          setSlidersLoading(true);
+          try {
+            const res = await fetch('https://forlandservice.onrender.com/slider/?isActive=true');
+            const data = await res.json();
+
+            // Sort sliders by displayOrder
+            const sortedSliders = data.sliders.sort((a, b) => a.displayOrder - b.displayOrder);
+            setSliders(sortedSliders);
+          } catch (error) {
+            console.error("Error fetching sliders:", error);
+          } finally {
+            setSlidersLoading(false);
+          }
+        };
+
+        const fetchVideos = async () => {
+          setVideosLoading(true);
+          try {
+            const res = await fetch('https://forlandservice.onrender.com/youtube/?isActive=true');
+            const data = await res.json();
+
+            // Sort videos by displayOrder
+            const sortedVideos = data.videos.sort((a, b) => a.displayOrder - b.displayOrder);
+            setVideos(sortedVideos);
+          } catch (error) {
+            console.error("Error fetching videos:", error);
+          } finally {
+            setVideosLoading(false);
+          }
+        };
+
         useEffect(() => {
           fetchNews();
+          fetchSliders();
+          fetchVideos();
         }, []);
 
-        
+        // Auto-slide effect for videos
+        useEffect(() => {
+          let autoSlideInterval;
+
+          if (!isPlaying && videos.length > 1) {
+            autoSlideInterval = setInterval(() => {
+              setCurrentVideoIndex((prevIndex) =>
+                prevIndex === videos.length - 1 ? 0 : prevIndex + 1
+              );
+            }, 5000); // 5 seconds
+          }
+
+          return () => {
+            if (autoSlideInterval) {
+              clearInterval(autoSlideInterval);
+            }
+          };
+        }, [isPlaying, videos.length]);
+
+
         const handlePlayClick = (e) => {
-          console.log('playing')
           e.preventDefault();
           setIsPlaying(true);
         };
 
+        const handlePauseClick = (e) => {
+          e.preventDefault();
+          setIsPlaying(false);
+        };
+
+        const handlePrevVideo = () => {
+          if (videos.length > 0) {
+            setCurrentVideoIndex((prevIndex) =>
+              prevIndex === 0 ? videos.length - 1 : prevIndex - 1
+            );
+            setIsPlaying(false);
+          }
+        };
+
+        const handleNextVideo = () => {
+          if (videos.length > 0) {
+            setCurrentVideoIndex((prevIndex) =>
+              prevIndex === videos.length - 1 ? 0 : prevIndex + 1
+            );
+            setIsPlaying(false);
+          }
+        };
+
+        const extractYouTubeId = (url) => {
+          const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
+          const match = url.match(regExp);
+          return (match && match[2].length === 11) ? match[2] : null;
+        };
 
         function slugifyCategory(category) {
           if(category === 'Events and Trainings') {
@@ -62,7 +147,13 @@ import { ParallaxProvider, ParallaxBanner } from 'react-scroll-parallax';
       
 
         useEffect(() => {
-            if (window.$) {
+            if (window.$ && !slidersLoading && sliders.length > 0) {
+              // Destroy existing carousel if it exists
+              if (window.$('.banner-slider').data('owl.carousel')) {
+                window.$('.banner-slider').data('owl.carousel').destroy();
+              }
+
+              // Initialize carousel
               if (window.$('.banner-slider').length > 0) {
                 window.$('.banner-slider').owlCarousel({
                   items: 1,
@@ -87,10 +178,10 @@ import { ParallaxProvider, ParallaxBanner } from 'react-scroll-parallax';
                   }
                 });
               }
-            } else {
+            } else if (!window.$) {
               console.error("jQuery is not loaded.");
             }
-          }, []); // Runs only once on mount
+          }, [slidersLoading, sliders]); // Re-run when sliders data changes
     
           useEffect(() => {
             if (window.$('.xs-portfolio-grid').length > 0) {
@@ -345,72 +436,121 @@ import { ParallaxProvider, ParallaxBanner } from 'react-scroll-parallax';
 
         return (
           <>
+          <style>{`
+            @keyframes videoSlideIn {
+              0% {
+                opacity: 0;
+                transform: translateX(30px);
+              }
+              100% {
+                opacity: 1;
+                transform: translateX(0);
+              }
+            }
+
+            @keyframes contentFadeSlide {
+              0% {
+                opacity: 0;
+                transform: translateY(20px);
+              }
+              100% {
+                opacity: 1;
+                transform: translateY(0);
+              }
+            }
+
+            @keyframes fadeIn {
+              0% {
+                opacity: 0;
+              }
+              100% {
+                opacity: 1;
+              }
+            }
+
+            .video-item img,
+            .video-iframe-container {
+              will-change: transform, opacity;
+            }
+
+            .call-back-content h3,
+            .call-back-content p,
+            .call-back-form {
+              will-change: transform, opacity;
+            }
+          `}</style>
           <Layout>
             {/* Banner Section */}
             <section className="xs-banner-sec xs-banner-v2-sec owl-carousel banner-slider">
-              <div className="banner-slider-item banner-item1" style={{ backgroundImage: "url(https://res.cloudinary.com/dedfrilse/image/upload/v1743850116/qzkq5voi5goo0mkhmizi.png)" }}>
-                <div className="slider-table">
-                  <div className="slider-table-cell">
-                    <div className="container">
-                      <div className="col-lg-9 ">
-                        <div className="banner-content">
-                          <h2>Forestry, Land Use and Value Chains Development in Tanzania (FORLAND)
-                          </h2>
-                          <p>
-                          FORLAND aims to contribute to a sustainable and inclusive forestry sector, contributing to Tanzania’s economic growth, poverty reduction, environmental sustainability and resilience against climate change impacts.
-                          </p>
-                          <div className="xs-btn-wraper">
-                            <a href="/what-we-do" className="xs-btn"> Learn More </a>
-                            <a href="/focus-areas" className="xs-btn fill">Focus Areas</a>
+              {slidersLoading ? (
+                // Loading skeleton or placeholder
+                <div className="banner-slider-item" style={{ backgroundImage: "url(assets/images/default-slider.jpg)" }}>
+                  <div className="slider-table">
+                    <div className="slider-table-cell">
+                      <div className="container">
+                        <div className="col-lg-9">
+                          <div className="banner-content">
+                            <div className="skeleton-box" style={{ height: '60px', width: '80%', backgroundColor: '#e0e0e0', marginBottom: '20px' }}></div>
+                            <div className="skeleton-box" style={{ height: '20px', width: '100%', backgroundColor: '#e0e0e0', marginBottom: '10px' }}></div>
+                            <div className="skeleton-box" style={{ height: '20px', width: '90%', backgroundColor: '#e0e0e0', marginBottom: '20px' }}></div>
                           </div>
                         </div>
                       </div>
                     </div>
                   </div>
                 </div>
-              </div>
-      
-              <div className="banner-slider-item banner-item2" style={{ backgroundImage: "url(https://res.cloudinary.com/dedfrilse/image/upload/v1743850110/qgmdqrbdg9rktgidmcq5.png)" }}>
-                <div className="slider-table">
-                  <div className="slider-table-cell">
-                    <div className="container">
-                      <div className="col-lg-9">
-                        <div className="banner-content">
-                          <h2>Forestry, Land Use and Value Chains Development in Tanzania (FORLAND)</h2>
-                          <p>
-                          FORLAND aims to contribute to a sustainable and inclusive forestry sector, contributing to Tanzania’s economic growth, poverty reduction, environmental sustainability and resilience against climate change impacts.
-                          </p>
-                          <div className="xs-btn-wraper">
-                            <a href="/what-we-do" className="xs-btn">Learn More</a>
-                            <a href="/focus-areas" className="xs-btn fill">Focus Areas</a>
+              ) : sliders.length > 0 ? (
+                sliders.map((slider, index) => (
+                  <div
+                    key={slider._id}
+                    className={`banner-slider-item banner-item${index + 1}`}
+                    style={{ backgroundImage: `url(${slider.backgroundImage})` }}
+                  >
+                    <div className="slider-table">
+                      <div className="slider-table-cell">
+                        <div className="container">
+                          <div className="col-lg-9">
+                            <div className="banner-content">
+                              <h2>{slider.title}</h2>
+                              <p style={{textAlign: 'left'}}>
+                                {slider.subtitle}
+                              </p>
+                              <div className="xs-btn-wraper">
+                                {slider.primaryButtonText && slider.primaryButtonLink && (
+                                  <a href={slider.primaryButtonLink} className="xs-btn">
+                                    {slider.primaryButtonText}
+                                  </a>
+                                )}
+                                {slider.secondaryButtonText && slider.secondaryButtonLink && (
+                                  <a href={slider.secondaryButtonLink} className="xs-btn fill">
+                                    {slider.secondaryButtonText}
+                                  </a>
+                                )}
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ))
+              ) : (
+                // Fallback if no sliders are available
+                <div className="banner-slider-item banner-item1" style={{ backgroundImage: "url(assets/images/default-slider.jpg)" }}>
+                  <div className="slider-table">
+                    <div className="slider-table-cell">
+                      <div className="container">
+                        <div className="col-lg-9">
+                          <div className="banner-content">
+                            <h2>Welcome to FORLAND</h2>
+                            <p>Loading content...</p>
                           </div>
                         </div>
                       </div>
                     </div>
                   </div>
                 </div>
-              </div>
-      
-              <div className="banner-slider-item banner-item3" style={{ backgroundImage: "url(https://res.cloudinary.com/dedfrilse/image/upload/v1743850111/uqoysgpyasi31hyygpew.png)" }}>
-                <div className="slider-table">
-                  <div className="slider-table-cell">
-                    <div className="container">
-                      <div className="col-lg-9">
-                        <div className="banner-content">
-                          <h2>Forestry, Land Use and Value Chains Development in Tanzania (FORLAND)</h2>
-                          <p style={{textAlign: 'left'}}>
-                          FORLAND aims to contribute to a sustainable and inclusive forestry sector, contributing to Tanzania’s economic growth, poverty reduction, environmental sustainability and resilience against climate change impacts.
-                          </p>
-                          <div className="xs-btn-wraper">
-                            <a href="/what-we-do" className="xs-btn">Learn More</a>
-                            <a href="/focus-areas" className="xs-btn fill">Focus Areas</a>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
+              )}
             </section>
       
             {/* About Inner Section */}
@@ -469,49 +609,210 @@ import { ParallaxProvider, ParallaxBanner } from 'react-scroll-parallax';
             {/* Video Section */}
             <section className="video-sec">
       <div style={{height: 470}} className="container-fluid">
-        <div style={{height: 470}} className="row">
-          <div style={{height: 470}} className="col-lg-7 xs-padding-0 align-self-center">
-            <div className="video-item">
-              {isPlaying ? (
-                <>
-                  <img src="assets/images/video-img.jpg" alt="Video thumbnail" />
-                  <a className="video-play-btn" onClick={() => handlePlayClick()}>
-                    <i className="icon icon-play-button2"></i>
-                  </a>
-                </>
-              ) : (
-                <div className="video-iframe-container" style={{ position: 'relative', height: 470, overflow: 'hidden', width: '100%' }}>
-                  <iframe 
-                    style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: 470 }}
-                    src="https://www.youtube.com/embed/fOHY2GdPpZ4?autoplay=0&start=8" 
-                    title="PFP Impact Documentary"
-                    frameBorder="0" 
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
-                    allowFullScreen>
-                  </iframe>
-                </div>
-              )}
+        {videosLoading ? (
+          <div style={{height: 470}} className="row">
+            <div style={{height: 470}} className="col-lg-7 xs-padding-0 align-self-center">
+              <div className="skeleton-box" style={{ height: '470px', width: '100%', backgroundColor: '#e0e0e0' }}></div>
             </div>
-          </div>
-          <div style={{height: 470}} className="col-lg-5 xs-padding-0">
-            <div className="call-to-action-v2">
-              <div className="call-back-content">
-                <h3>PFP Impact Documentary</h3>
-                <p style={{textAlign: 'justify'}} className="call-contact-text">
-                This is a combined video documentary that displays the PFP journey since commenced and the impact the project created throughout its implementation.
-                </p>
-                <p style={{textAlign: 'justify'}} className="call-contact-text">
-                For more documentary videos, please visit PFP Youtube channel to find more. Click the button below.
-                </p>
-                <form className="call-back-form">
-                  <div className="form-group call-back-btn">
-                    <button type="button" onClick={onPressLink} className="xs-btn xs-v2-btn">More Videos</button>
-                  </div>
-                </form>
+            <div style={{height: 470}} className="col-lg-5 xs-padding-0">
+              <div className="call-to-action-v2">
+                <div className="call-back-content">
+                  <div className="skeleton-box" style={{ height: '30px', width: '70%', backgroundColor: '#e0e0e0', marginBottom: '20px' }}></div>
+                  <div className="skeleton-box" style={{ height: '100px', width: '100%', backgroundColor: '#e0e0e0', marginBottom: '20px' }}></div>
+                  <div className="skeleton-box" style={{ height: '40px', width: '150px', backgroundColor: '#e0e0e0' }}></div>
+                </div>
               </div>
             </div>
           </div>
-        </div>
+        ) : videos.length > 0 ? (
+          <div style={{height: 470, position: 'relative'}} className="row">
+            <div style={{height: 470}} className="col-lg-7 xs-padding-0 align-self-center">
+              <div className="video-item" style={{ position: 'relative', overflow: 'hidden' }}>
+                {!isPlaying ? (
+                  <>
+                    <img
+                      key={currentVideoIndex}
+                      src={`https://img.youtube.com/vi/${extractYouTubeId(videos[currentVideoIndex].youtubeUrl)}/maxresdefault.jpg`}
+                      alt={videos[currentVideoIndex].title}
+                      style={{
+                        width: '100%',
+                        height: '470px',
+                        objectFit: 'cover',
+                        animation: 'videoSlideIn 0.6s ease-out',
+                        transition: 'opacity 0.4s ease-in-out'
+                      }}
+                      onError={(e) => {
+                        e.target.src = `https://img.youtube.com/vi/${extractYouTubeId(videos[currentVideoIndex].youtubeUrl)}/hqdefault.jpg`;
+                      }}
+                    />
+                    <a className="video-play-btn" onClick={handlePlayClick} style={{ cursor: 'pointer' }}>
+                      <i className="icon icon-play-button2"></i>
+                    </a>
+                  </>
+                ) : (
+                  <div
+                    className="video-iframe-container"
+                    style={{
+                      position: 'relative',
+                      height: 470,
+                      overflow: 'hidden',
+                      width: '100%',
+                      animation: 'fadeIn 0.5s ease-in'
+                    }}
+                  >
+                    <iframe
+                      key={currentVideoIndex}
+                      style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: 470 }}
+                      src={`https://www.youtube.com/embed/${extractYouTubeId(videos[currentVideoIndex].youtubeUrl)}?autoplay=1&enablejsapi=1`}
+                      title={videos[currentVideoIndex].title}
+                      frameBorder="0"
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                      allowFullScreen>
+                    </iframe>
+                  </div>
+                )}
+
+                {/* Navigation arrows */}
+                {videos.length > 1 && !isPlaying && (
+                  <>
+                    <button
+                      onClick={handlePrevVideo}
+                      className="video-nav-btn"
+                      style={{
+                        position: 'absolute',
+                        left: '20px',
+                        top: '50%',
+                        transform: 'translateY(-50%)',
+                        background: 'rgba(0,0,0,0.5)',
+                        border: 'none',
+                        color: 'white',
+                        fontSize: '24px',
+                        padding: '10px 15px',
+                        cursor: 'pointer',
+                        borderRadius: '4px',
+                        zIndex: 10,
+                        transition: 'all 0.3s ease',
+                        animation: 'fadeIn 0.5s ease-in'
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.background = 'rgba(0,0,0,0.8)';
+                        e.currentTarget.style.transform = 'translateY(-50%) scale(1.1)';
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.background = 'rgba(0,0,0,0.5)';
+                        e.currentTarget.style.transform = 'translateY(-50%) scale(1)';
+                      }}
+                    >
+                      <i className="icon icon-chevron-left"></i>
+                    </button>
+                    <button
+                      onClick={handleNextVideo}
+                      className="video-nav-btn"
+                      style={{
+                        position: 'absolute',
+                        right: '20px',
+                        top: '50%',
+                        transform: 'translateY(-50%)',
+                        background: 'rgba(0,0,0,0.5)',
+                        border: 'none',
+                        color: 'white',
+                        fontSize: '24px',
+                        padding: '10px 15px',
+                        cursor: 'pointer',
+                        borderRadius: '4px',
+                        zIndex: 10,
+                        transition: 'all 0.3s ease',
+                        animation: 'fadeIn 0.5s ease-in'
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.background = 'rgba(0,0,0,0.8)';
+                        e.currentTarget.style.transform = 'translateY(-50%) scale(1.1)';
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.background = 'rgba(0,0,0,0.5)';
+                        e.currentTarget.style.transform = 'translateY(-50%) scale(1)';
+                      }}
+                    >
+                      <i className="icon icon-chevron-right"></i>
+                    </button>
+                  </>
+                )}
+
+                {/* Video counter */}
+                {videos.length > 1 && (
+                  <div style={{
+                    position: 'absolute',
+                    bottom: '20px',
+                    right: '20px',
+                    background: 'rgba(0,0,0,0.7)',
+                    color: 'white',
+                    padding: '8px 15px',
+                    borderRadius: '20px',
+                    fontSize: '14px',
+                    zIndex: 10
+                  }}>
+                    {currentVideoIndex + 1} / {videos.length}
+                  </div>
+                )}
+              </div>
+            </div>
+            <div style={{height: 470}} className="col-lg-5 xs-padding-0">
+              <div className="call-to-action-v2">
+                <div className="call-back-content">
+                  <h3
+                    key={`title-${currentVideoIndex}`}
+                    style={{
+                      animation: 'contentFadeSlide 0.6s ease-out',
+                      opacity: 1
+                    }}
+                  >
+                    {videos[currentVideoIndex].title}
+                  </h3>
+                  <p
+                    key={`desc-${currentVideoIndex}`}
+                    style={{
+                      textAlign: 'justify',
+                      whiteSpace: 'pre-line',
+                      animation: 'contentFadeSlide 0.7s ease-out',
+                      animationDelay: '0.1s',
+                      opacity: 1
+                    }}
+                    className="call-contact-text"
+                  >
+                    {videos[currentVideoIndex].description}
+                  </p>
+                  {videos[currentVideoIndex].buttonText && videos[currentVideoIndex].buttonLink && (
+                    <form
+                      className="call-back-form"
+                      key={`btn-${currentVideoIndex}`}
+                      style={{
+                        animation: 'contentFadeSlide 0.8s ease-out',
+                        animationDelay: '0.2s',
+                        opacity: 1
+                      }}
+                    >
+                      <div className="form-group call-back-btn">
+                        <button
+                          type="button"
+                          onClick={() => window.open(videos[currentVideoIndex].buttonLink, '_blank')}
+                          className="xs-btn xs-v2-btn"
+                        >
+                          {videos[currentVideoIndex].buttonText}
+                        </button>
+                      </div>
+                    </form>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+        ) : (
+          <div style={{height: 470}} className="row">
+            <div className="col-lg-12 text-center align-self-center">
+              <p>No videos available at the moment.</p>
+            </div>
+          </div>
+        )}
       </div>
     </section>
       
@@ -799,74 +1100,183 @@ import { ParallaxProvider, ParallaxBanner } from 'react-scroll-parallax';
               </div>
             </ParallaxBanner>
             </ParallaxProvider>
-            <section className="latest-news-sec section-padding">
+            <section className="latest-news-sec section-padding" style={{ backgroundColor: '#fff' }}>
     <div className="container">
-      <div className="row">
-        <div className="col-lg-4 align-self-center wow fadeInUp" data-wow-duration="1.5s" data-wow-delay="300ms">
-          <div className="latest-news-content">
-            <h2 className="column-title">
-              <span className="xs-title">From our blog</span>
-              Latest News & Updates
-            </h2>
-            <p>
-              Stay informed about the latest updates on FORLAND and related activities by visiting our blog page and following us on social media.
-            </p>
-            <a href="#" className="xs-btn">View All</a>
-          </div>
-        </div>
-        <div className="col-lg-8">
-          <div className="row">
-            {loading ? (
-              // Show skeleton loaders while loading
-              <>
-                <div className="col-md-6 wow fadeInUp" data-wow-duration="1.5s" data-wow-delay="400ms">
-                  <NewsSkeleton />
-                </div>
-                <div className="col-md-6 wow fadeInUp" data-wow-duration="1.5s" data-wow-delay="500ms">
-                  <NewsSkeleton />
-                </div>
-              </>
-            ) : (
-              // Render actual news items when loaded
-              newsItems.map(news => (
-                <div 
-                  key={news.id}
-                  className="col-md-6 wow fadeInUp" 
-                  data-wow-duration="1.5s" 
-                  data-wow-delay={news.delay || "400ms"}
-                >
-                  <div className="single-latest-news">
-                    <div className="latest-news-img">
-                      <a href={`/${slugifyCategory(news?.category)}/${news._id}`}>
-                        <img 
-                          src={news.photo || "assets/images/default-news.jpg"} 
-                          alt={news.title} 
-                          onError={(e) => {
-                            e.target.src = "assets/images/default-news.jpg";
-                          }}
-                        />
-                      </a>
-                    </div>
-                    <div className="single-news-content">
-                      <span className="date-info">
-                        {new Date(news.publicationDate).toLocaleDateString('en-US', {
-                          year: 'numeric',
-                          month: 'short',
-                          day: 'numeric'
-                        })}
-                      </span>
-                      <h3 className="xs-post-title">
-                        <a href={`/${slugifyCategory(news?.category)}/${news._id}`}>{news.title}</a>
-                      </h3>
-                      <p>{news?.description || news?.description.substring(0, 150)}...</p>
-                    </div>
-                  </div>
-                </div>
-              ))
-            )}
+      {/* Section Header */}
+      <div className="row mb-5">
+        <div className="col-12">
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '50px' }}>
+            <div style={{ maxWidth: '600px' }}>
+              <p style={{ color: '#6B7280', textTransform: 'uppercase', fontSize: '13px', fontWeight: '600', marginBottom: '10px', letterSpacing: '0.5px' }}>FROM OUR BLOG</p>
+              <h2 style={{ fontSize: '40px', fontWeight: '700', color: '#111827', marginBottom: '12px', lineHeight: '1.2' }}>Latest News & Updates</h2>
+              <p style={{ color: '#6B7280', fontSize: '16px', lineHeight: '1.6' }}>
+                Stay informed about the latest updates on FORLAND and related activities by visiting our blog page and following us on social media.
+              </p>
+            </div>
+            <a href="/news" style={{
+              backgroundColor: '#059669',
+              color: '#fff',
+              textDecoration: 'none',
+              fontWeight: '600',
+              fontSize: '14px',
+              padding: '12px 24px',
+              borderRadius: '6px',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '8px',
+              transition: 'background-color 0.3s ease',
+              marginTop: '35px'
+            }}
+            onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#047857'}
+            onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#059669'}>
+              View All <span>→</span>
+            </a>
           </div>
         </div>
       </div>
+
+      {/* News Grid - 3 Equal Cards */}
+      <div className="row g-4">
+        {loading ? (
+          <>
+            <div className="col-lg-4 col-md-6"><NewsSkeleton /></div>
+            <div className="col-lg-4 col-md-6"><NewsSkeleton /></div>
+            <div className="col-lg-4 col-md-6"><NewsSkeleton /></div>
+          </>
+        ) : (
+          newsItems.map((news, index) => (
+            <div key={news._id} className="col-lg-4 col-md-6">
+              <div style={{
+                backgroundColor: '#fff',
+                borderRadius: '12px',
+                overflow: 'hidden',
+                border: '1px solid #E5E7EB',
+                height: '100%',
+                display: 'flex',
+                flexDirection: 'column',
+                transition: 'all 0.3s ease',
+                cursor: 'pointer'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.boxShadow = '0 10px 30px rgba(0,0,0,0.1)';
+                e.currentTarget.style.transform = 'translateY(-4px)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.boxShadow = 'none';
+                e.currentTarget.style.transform = 'translateY(0)';
+              }}>
+                {/* Image */}
+                <a href={`/${slugifyCategory(news?.category)}/${news._id}`} style={{ textDecoration: 'none' }}>
+                  <div style={{ position: 'relative', paddingTop: '60%', overflow: 'hidden', backgroundColor: '#F3F4F6' }}>
+                    <img
+                      src={news.photo || "assets/images/default-news.jpg"}
+                      alt={news.title}
+                      style={{
+                        position: 'absolute',
+                        top: 0,
+                        left: 0,
+                        width: '100%',
+                        height: '100%',
+                        objectFit: 'cover'
+                      }}
+                      onError={(e) => {
+                        e.target.src = "assets/images/default-news.jpg";
+                      }}
+                    />
+                  </div>
+                </a>
+
+                {/* Content */}
+                <div style={{ padding: '24px', flex: 1, display: 'flex', flexDirection: 'column' }}>
+                  {/* Category Badge */}
+                  <span style={{
+                    display: 'inline-block',
+                    width: 'fit-content',
+                    backgroundColor: '#ECFDF5',
+                    color: '#059669',
+                    padding: '3px 8px',
+                    borderRadius: '3px',
+                    fontSize: '10px',
+                    fontWeight: '600',
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.3px',
+                    marginBottom: '10px',
+                    lineHeight: '1'
+                  }}>
+                    {news.category || 'News'}
+                  </span>
+
+                  <a href={`/${slugifyCategory(news?.category)}/${news._id}`} style={{ textDecoration: 'none', color: 'inherit', flex: 1 }}>
+                    <h3 style={{
+                      fontSize: '18px',
+                      fontWeight: '700',
+                      color: '#111827',
+                      marginBottom: '12px',
+                      lineHeight: '1.4',
+                      display: '-webkit-box',
+                      WebkitLineClamp: 2,
+                      WebkitBoxOrient: 'vertical',
+                      overflow: 'hidden'
+                    }}>
+                      {news.title}
+                    </h3>
+                    <p style={{
+                      color: '#6B7280',
+                      fontSize: '14px',
+                      lineHeight: '1.6',
+                      marginBottom: '16px',
+                      display: '-webkit-box',
+                      WebkitLineClamp: 3,
+                      WebkitBoxOrient: 'vertical',
+                      overflow: 'hidden'
+                    }}>
+                      {news.description}
+                    </p>
+                  </a>
+
+                  {/* Footer */}
+                  <div style={{ marginTop: 'auto', paddingTop: '16px', borderTop: '1px solid #E5E7EB' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <span style={{ color: '#9CA3AF', fontSize: '13px' }}>
+                        {new Date(news.publicationDate).toLocaleDateString('en-US', {
+                          day: 'numeric',
+                          month: 'long',
+                          year: 'numeric'
+                        })}
+                      </span>
+                      <a href={`/${slugifyCategory(news?.category)}/${news._id}`} style={{
+                        color: '#059669',
+                        textDecoration: 'none',
+                        fontSize: '14px',
+                        fontWeight: '600',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '4px'
+                      }}>
+                        Read More <span>→</span>
+                      </a>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          ))
+        )}
+      </div>
+    </div>
+
+    {/* Social Media Feed */}
+    <div className='container' style={{marginTop: 80, marginBottom: 30}}>
+       <div style={{ display: 'flex', justifyContent: 'center', margin: '0 auto' }}>
+      <iframe
+        src="https://www.juicer.io/api/feeds/forlandtanzania_/iframe"
+        frameBorder="0"
+        width="100%"
+        height="1000"
+        style={{ display: 'block' }}
+        title="Juicer Feed"
+      ></iframe>
+    </div>
     </div>
   </section>
             </Layout>

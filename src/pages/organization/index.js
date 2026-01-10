@@ -1,8 +1,35 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import Layout from '../../components/layout';
+import BannerHeader from '../../components/BannerHeader';
 import { Helmet } from 'react-helmet-async';
+import Skeleton from 'react-loading-skeleton';
+import 'react-loading-skeleton/dist/skeleton.css';
 
 const Organization = () => {
+  const [structure, setStructure] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    const fetchOrganizationStructure = async () => {
+      try {
+        const response = await fetch('https://forlandservice.onrender.com/organization-structure/active');
+        if (!response.ok) {
+          throw new Error('Failed to fetch organization structure');
+        }
+        const data = await response.json();
+        setStructure(data);
+      } catch (err) {
+        setError('Failed to load organization structure data');
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchOrganizationStructure();
+  }, []);
+
   return (
     <Layout>
         <div className="about-us-page">
@@ -10,66 +37,89 @@ const Organization = () => {
                   <title>Organization - FORLAND</title>
                   </Helmet>
       {/* Breadcrumb Banner Section */}
-      <section 
-        className="banner-inner-sec" 
-        style={{backgroundImage: "url('assets/images/bg1.png')"}}
-      >
-        <div className="banner-table">
-          <div className="banner-table-cell">
+      <BannerHeader title="Organization Structure" breadcrumb="Organization Structure" />
+
+      {loading ? (
+        <>
+          {/* Loading Skeleton */}
+          <section className="ready-to-contact3 section-padding">
             <div className="container">
-              <div className="banner-inner-content">
-                <h2 className="banner-inner-title">Organization Structure</h2>
-                <ul className="xs-breadcumb">
-                  <li><a href="/"> Home / </a> Organization Structure</li>
-                </ul>
+              <div className="col-lg-12">
+                <div className="ready-to-contact-content" style={{alignItems: 'center'}}>
+                  <Skeleton height={40} width={300} />
+                  <Skeleton count={3} style={{ marginTop: 20 }} />
+                </div>
+              </div>
+            </div>
+          </section>
+          <section className="section-padding">
+            <div className="container">
+              <div className="row">
+                <div className="col-12 d-flex justify-content-center">
+                  <Skeleton height={400} width={600} />
+                </div>
+              </div>
+            </div>
+          </section>
+        </>
+      ) : error ? (
+        <section className="ready-to-contact3 section-padding">
+          <div className="container">
+            <div className="col-lg-12">
+              <div className="ready-to-contact-content text-center" style={{alignItems: 'center'}}>
+                <p style={{color: 'red'}}>{error}</p>
               </div>
             </div>
           </div>
-        </div>
-      </section>
+        </section>
+      ) : structure ? (
+        <>
+          {/* Team Section */}
+          <section className="ready-to-contact3 section-padding">
+            <div className="container">
+              <div className="col-lg-12">
+                <div className="ready-to-contact-content" style={{alignItems: 'center'}}>
+                  <h2 style={{textAlign: 'center'}}>{structure.title}</h2>
+                  <p style={{textAlign: 'center'}}>
+                    {structure.description}
+                  </p>
+                </div>
+              </div>
+            </div>
+          </section>
 
-
-      {/* Team Section */}
-       <section 
-        className="ready-to-contact3 section-padding" 
-       
-      >
-        <div className="container">
-          <div className="col-lg-12">
-            <div className="ready-to-contact-content" style={{alignItems: 'center'}}>
-              <h2 style={{textAlign: 'center'}}>Project management and decision-making
-              </h2>
-              <p style={{textAlign: 'center'}}>
-              The project management and decision-making system will ensure that the Project reaches the planned outcome. If the Project is not on track, corrective measures need to be made with immediate effect. The decision-making system of the Project includes the Supervisory Board (SB), the Steering Committee (SC) and the Project Management Team (PMT).
-
-              </p>
-             
+          {/* Image Section */}
+          <section className="section-padding">
+            <div className="container">
+              <div className="row">
+                <div className="col-12 d-flex justify-content-center">
+                  <img 
+                    src={structure.banner} 
+                    alt={structure.title} 
+                    style={{
+                      objectFit: 'contain',
+                      maxWidth: '100%',
+                      height: 'auto'
+                    }}
+                  />
+                </div>
+              </div>
+            </div>
+          </section>
+        </>
+      ) : (
+        <section className="ready-to-contact3 section-padding">
+          <div className="container">
+            <div className="col-lg-12">
+              <div className="ready-to-contact-content text-center" style={{alignItems: 'center'}}>
+                <p>No organization structure data available</p>
+              </div>
             </div>
           </div>
-        </div>
-      </section>
-
- {/* New Image Section */}
- <section className="section-padding">
-        <div className="container">
-          <div className="row">
-            <div className="col-12 d-flex justify-content-center">
-              <img 
-                src="https://res.cloudinary.com/dedfrilse/image/upload/v1745938910/dvxrtd4rtvfowfeccgit.png" 
-                alt="Organization Structure" 
-                style={{
-                  objectFit: 'contain',
-                  maxWidth: '100%',
-                  height: 'auto'
-                }}
-              />
-            </div>
-          </div>
-        </div>
-      </section>
+        </section>
+      )}
     </div>  
     </Layout>
-  
   );
 };
 
