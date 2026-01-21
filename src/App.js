@@ -26,6 +26,7 @@ import Events from "./pages/eventsandtraining";
 import ProjectGallery from "./pages/gallery";
 import BlogSingle from "./pages/blogsingle";
 import Pfptechnicalreports from "./pages/pfptechnicalreports";
+import Pfpadministrativeandmanagementreports from "./pages/pfpadministrativeandmanagementreports";
 import Forvactechnicalreports from "./pages/forvactechnicalreports";
 import Forvacadministrativeandmanagementreports from "./pages/forvacadministrativeandmanagementreports";
 import InstitutionalSupportReport from "./pages/institutionalsupportreport";
@@ -76,6 +77,8 @@ function App() {
     <Route path="/blog-single" element={<BlogSingle />} />
     <Route path="/pfp-technical-reports" element={<Pfptechnicalreports />} />
     <Route path="/pfp-technical-reports/:id" element={<Blog />} />
+    <Route path="/pfp-administrative-and-management-reports" element={<Pfpadministrativeandmanagementreports />} />
+    <Route path="/pfp-administrative-and-management-reports/:id" element={<Blog />} />
     <Route path="/forvac-technical-reports" element={<Forvactechnicalreports />} />
     <Route path="/forvac-technical-reports/:id" element={<Blog />} />
     <Route path="/forvac-administrative-and-management-reports" element={<Forvacadministrativeandmanagementreports />} />

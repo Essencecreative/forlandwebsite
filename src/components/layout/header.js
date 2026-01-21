@@ -119,7 +119,13 @@ const Header = () => {
                     <li>
                       <a href="#">Publications</a>
                       <ul className="nav-dropdown">
-                        <li><a href="/pfp-technical-reports"> ⁠PFP Technical Reports</a></li>
+                        <li>
+                          <a href="#">⁠PFP Reports</a>
+                          <ul className="nav-dropdown">
+                            <li><a href="/pfp-technical-reports">⁠PFP Technical Reports</a></li>
+                            <li><a href="/pfp-administrative-and-management-reports">⁠PFP Administrative & Management Reports</a></li>
+                          </ul>
+                        </li>
                         <li>
                           <a href="#">⁠FORVAC Reports</a>
                           <ul className="nav-dropdown">

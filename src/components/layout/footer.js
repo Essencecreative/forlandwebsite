@@ -141,6 +141,36 @@ const Footer = () => {
                       <i className="fa fa-instagram"></i>
                     </a>
                   </li>
+                  <li style={{ listStyle: 'none' }}>
+                    <a
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      href="https://www.youtube.com/@FORLAND_WEB/streams"
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        width: '40px',
+                        height: '40px',
+                        borderRadius: '50%',
+                        backgroundColor: '#FF0000',
+                        color: '#fff',
+                        fontSize: '16px',
+                        transition: 'all 0.3s ease',
+                        border: '1px solid #FF0000'
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.transform = 'translateY(-3px)';
+                        e.currentTarget.style.boxShadow = '0 4px 12px rgba(255, 0, 0, 0.4)';
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.transform = 'translateY(0)';
+                        e.currentTarget.style.boxShadow = 'none';
+                      }}
+                    >
+                      <i className="fa fa-youtube-play"></i>
+                    </a>
+                  </li>
                 </ul>
               </div>
             </div>
