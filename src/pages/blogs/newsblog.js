@@ -112,7 +112,7 @@ const NewsBlog = () => {
         <section className="xs-blog-single-sec section-padding">
           <div className="container">
             <div className="row">
-              <div className="col-lg-12">
+              <div className={blogData?.documentUrl ? "col-lg-8" : "col-lg-12"}>
                 <div className="blog-content-item single-blog-details">
                   <div className="single-blog-item">
                     {/* Render Markdown content */}
@@ -123,7 +123,38 @@ const NewsBlog = () => {
                   </div>
                 </div>
               </div>
-            
+              {blogData?.documentUrl && (
+                <div className="col-lg-4">
+                  <div className="sidebar-widgets">
+                    {/* Download Document Widget */}
+                    <div className="widget widget-categories">
+                      <h4 className="widget-title">
+                        <span className="light-text">Download</span> Document
+                      </h4>
+                      <div className="mt-3">
+                        <a
+                          href={blogData.documentUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="btn"
+                          style={{
+                            backgroundColor: "#006838",
+                            color: "#fff",
+                            width: "100%",
+                            padding: "10px 0",
+                            textAlign: "center",
+                            display: "inline-block",
+                            textDecoration: "none",
+                            borderRadius: "5px",
+                          }}
+                        >
+                          Download
+                        </a>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </section>

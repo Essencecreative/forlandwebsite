@@ -1100,7 +1100,7 @@ import { ParallaxProvider, ParallaxBanner } from 'react-scroll-parallax';
               </div>
             </ParallaxBanner>
             </ParallaxProvider>
-            <section className="latest-news-sec section-padding" style={{ backgroundColor: '#fff' }}>
+            <section className="latest-news-sec section-padding" style={{ backgroundColor: '#fff', paddingBottom: 0 }}>
     <div className="container">
       {/* Section Header */}
       <div className="row mb-5">
@@ -1266,13 +1266,13 @@ import { ParallaxProvider, ParallaxBanner } from 'react-scroll-parallax';
     </div>
 
     {/* Social Media Feed */}
-    <div className='container' style={{marginTop: 80, marginBottom: 30}}>
+    <div className='container' style={{marginTop: 80, marginBottom: 0}}>
        <div style={{ display: 'flex', justifyContent: 'center', margin: '0 auto' }}>
       <iframe
         src="https://www.juicer.io/api/feeds/forlandtanzania_/iframe"
         frameBorder="0"
         width="100%"
-        height="1000"
+        height="600"
         style={{ display: 'block' }}
         title="Juicer Feed"
       ></iframe>
