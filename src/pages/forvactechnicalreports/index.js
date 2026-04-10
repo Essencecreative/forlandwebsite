@@ -10,7 +10,7 @@ const pageContent = {
   breadcrumb: "FORVAC Technical Reports",
   metaTitle: "FORVAC Technical Reports - FORLAND",
   to: '/forvac-technical-reports',
-  category: 'forvac',
+  category: 'forvac-technical',
 };
 
 

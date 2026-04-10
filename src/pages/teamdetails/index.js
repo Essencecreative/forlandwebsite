@@ -14,7 +14,7 @@ const Teamdetails = () => {
   useEffect(() => {
     const fetchMember = async () => {
       try {
-        const response = await fetch(`https://forlandservice.onrender.com/team/${id}`);
+        const response = await fetch(`http://localhost:5050/team/${id}`);
         if (!response.ok) {
           throw new Error('Failed to fetch team member data');
         }

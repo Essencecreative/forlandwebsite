@@ -20,7 +20,7 @@ const Footer = () => {
                 <p>
                 FORLAND aims to contribute to a Sustainable and inclusive forestry sector, contributing to Tanzania’s economic growth, poverty reduction, environmental sustainability and resilience against climate change impacts.
                 </p>
-                <ul className="footer-social" style={{ display: 'flex', gap: '12px', padding: 0, marginTop: '20px' }}>
+                <ul className="footer-social" style={{ display: 'flex', gap: '12px', padding: 0, marginTop: '20px', flexWrap: 'wrap' }}>
                   <li style={{ listStyle: 'none' }}>
                     <a
                       target="_blank"
@@ -108,7 +108,7 @@ const Footer = () => {
                         e.currentTarget.style.boxShadow = 'none';
                       }}
                     >
-                      <i className="fa fa-twitter"></i>
+                      <span style={{ fontWeight: 'bold', fontSize: '18px' }}>X</span>
                     </a>
                   </li>
                   <li style={{ listStyle: 'none' }}>

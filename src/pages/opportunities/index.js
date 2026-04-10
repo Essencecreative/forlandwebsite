@@ -21,7 +21,7 @@ const Opportunities = ({
     const fetchOpportunities = async () => {
       try {
         const queryCategory = category && category !== 'all' ? `&category=${category}` : '';
-        const res = await axios.get(`https://forlandservice.onrender.com/opportunities?${queryCategory}`);
+        const res = await axios.get(`http://localhost:5050/opportunities?${queryCategory}`);
         setOpportunities(res.data); // Assuming response is array
       } catch (err) {
         console.error('Error fetching opportunities:', err);

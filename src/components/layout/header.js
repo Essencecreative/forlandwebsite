@@ -48,7 +48,7 @@ const Header = () => {
           <div className="row">
             <div  style={{display: 'flex', alignItems: 'center', justifyContent: 'center'}} className="col-md-12 header-middle-info align-self-center">
               <div className="logo">
-                <a href="./index.html">
+                <a href="/">
                   <img style={{width: 600, objectFit: 'contain'}} src="https://res.cloudinary.com/dedfrilse/image/upload/v1745587115/tijfiixui0xnhvtzvv06.png" alt="" />
                 </a>
               </div>
@@ -89,7 +89,7 @@ const Header = () => {
             <div className="col-lg-12">
               <nav id="navigation1" className="navigation header-nav clearfix">
                 <div className="nav-header">
-                  <a href="./index.html" className="mobile-logo">
+                  <a href="/" className="mobile-logo">
                     <img src="assets/images/mobile_logo.png" alt="" />
                   </a>
                   <div className="nav-toggle"></div>

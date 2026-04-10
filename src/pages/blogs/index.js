@@ -14,7 +14,7 @@ const Blog = () => {
   useEffect(() => {
     const fetchBlogData = async () => {
       try {
-        const response = await fetch(`https://forlandservice.onrender.com/publications/${id}`);
+        const response = await fetch(`http://localhost:5050/publications/${id}`);
         if (!response.ok) {
           throw new Error('Blog not found');
         }
@@ -29,6 +29,14 @@ const Blog = () => {
 
     fetchBlogData();
   }, [id]);
+
+  // Force hide navigation overlay that might be blocking clicks
+  useEffect(() => {
+    const overlay = document.querySelector('.nav-overlay-panel');
+    if (overlay) {
+      overlay.style.display = 'none';
+    }
+  }, []);
 
   const renderMarkdownContent = (markdown) => {
     return { __html: marked(markdown) };
@@ -112,7 +120,7 @@ const Blog = () => {
         <section className="xs-blog-single-sec section-padding">
           <div className="container">
             <div className="row">
-              <div className="col-lg-8">
+              <div className={blogData?.documentUrl ? "col-lg-8" : "col-lg-12"}>
                 <div className="blog-content-item single-blog-details">
                   <div className="single-blog-item">
                     {/* Render Markdown content */}
@@ -123,39 +131,42 @@ const Blog = () => {
                   </div>
                 </div>
               </div>
-              <div className="col-lg-4">
-      <div className="sidebar-widgets">
-
-        {/* Blog Categories Widget */}
-        <div className="widget widget-categories">
-      <h4 className="widget-title">
-        <span className="light-text">Download</span> Publication
-      </h4>
-      <div className="mt-3">
-        <a
-          href={blogData?.documentUrl}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="btn"
-          style={{
-            backgroundColor: "#006838",
-            color: "#fff",
-            width: "100%",
-            padding: "10px 0",
-            textAlign: "center",
-            display: "inline-block",
-            textDecoration: "none",
-            borderRadius: "5px",
-          }}
-        >
-          Download
-        </a>
-      </div>
-    </div>
-
-
-      </div>
-    </div>
+              {blogData?.documentUrl && (
+                <div className="col-lg-4">
+                  <div className="sidebar-widgets" style={{ pointerEvents: "auto", position: "relative", zIndex: 999999 }}>
+                    {/* Download Document Widget */}
+                    <div className="widget widget-categories" style={{ pointerEvents: "auto", position: "relative", zIndex: 999999 }}>
+                      <h4 className="widget-title">
+                        <span className="light-text">Download</span> Publication
+                      </h4>
+                      <div className="mt-3">
+                        <a
+                          href={blogData.documentUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="btn"
+                          style={{
+                            backgroundColor: "#006838",
+                            color: "#fff",
+                            width: "100%",
+                            padding: "10px 0",
+                            textAlign: "center",
+                            display: "inline-block",
+                            textDecoration: "none",
+                            borderRadius: "5px",
+                            cursor: "pointer !important",
+                            pointerEvents: "auto !important",
+                            position: "relative",
+                            zIndex: 999999,
+                          }}
+                        >
+                          Download
+                        </a>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </section>

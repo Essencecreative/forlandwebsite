@@ -7,7 +7,7 @@ const BannerHeader = ({ title, breadcrumb, fallbackImage = 'assets/images/bg1.pn
   useEffect(() => {
     const fetchBanner = async () => {
       try {
-        const response = await fetch('https://forlandservice.onrender.com/banners/active');
+        const response = await fetch('http://localhost:5050/banners/active');
         const data = await response.json();
 
         if (data && data.image) {

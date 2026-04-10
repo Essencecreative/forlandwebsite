@@ -16,14 +16,14 @@ const ProjectGallery = () => {
     const fetchGalleriesAndCategories = async () => {
       try {
         // Fetch galleries
-        const galleriesRes = await fetch('https://forlandservice.onrender.com/gallery?limit=1000');
+        const galleriesRes = await fetch('http://localhost:5050/gallery?limit=1000');
         const galleriesData = await galleriesRes.json();
         const galleriesArray = galleriesData.galleries || [];
         setGalleries(galleriesArray);
         setFilteredGalleries(galleriesArray);
 
         // Fetch categories from dedicated endpoint
-        const categoriesRes = await fetch('https://forlandservice.onrender.com/gallery-categories?page=1&limit=50&isActive=true');
+        const categoriesRes = await fetch('http://localhost:5050/gallery-categories?page=1&limit=50&isActive=true');
         const categoriesData = await categoriesRes.json();
         const categoriesArray = categoriesData.categories || [];
         setCategories(categoriesArray);
