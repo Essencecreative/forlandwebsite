@@ -14,7 +14,7 @@ const Blog = () => {
   useEffect(() => {
     const fetchBlogData = async () => {
       try {
-        const response = await fetch(`http://localhost:5050/publications/${id}`);
+        const response = await fetch(`https://forlandservice.onrender.com/publications/${id}`);
         if (!response.ok) {
           throw new Error('Blog not found');
         }

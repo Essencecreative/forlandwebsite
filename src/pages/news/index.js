@@ -24,7 +24,7 @@ const News = ({
     setLoading(true);
     try {
       const queryCategory = category && category !== 'all' ? `&category=${category}` : '';
-      const res = await fetch(`http://localhost:5050/news?page=${page}${queryCategory}`);
+      const res = await fetch(`https://forlandservice.onrender.com/news?page=${page}${queryCategory}`);
       const data = await res.json();
 
       setNewsItems(data.news);

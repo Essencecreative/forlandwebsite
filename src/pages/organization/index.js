@@ -13,7 +13,7 @@ const Organization = () => {
   useEffect(() => {
     const fetchOrganizationStructure = async () => {
       try {
-        const response = await fetch('http://localhost:5050/organization-structure/active');
+        const response = await fetch('https://forlandservice.onrender.com/organization-structure/active');
         if (!response.ok) {
           throw new Error('Failed to fetch organization structure');
         }

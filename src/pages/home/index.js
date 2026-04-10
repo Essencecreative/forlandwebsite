@@ -23,7 +23,7 @@ import { ParallaxProvider, ParallaxBanner } from 'react-scroll-parallax';
           setLoading(true);
           try {
             const queryCategory = category && category !== 'all' ? `&category=${category}` : '';
-            const res = await fetch(`http://localhost:5050/news?page=${page}${queryCategory}`);
+            const res = await fetch(`https://forlandservice.onrender.com/news?page=${page}${queryCategory}`);
             const data = await res.json();
 
             const sortedNews = data.news
@@ -46,7 +46,7 @@ import { ParallaxProvider, ParallaxBanner } from 'react-scroll-parallax';
         const fetchSliders = async () => {
           setSlidersLoading(true);
           try {
-            const res = await fetch('http://localhost:5050/slider/?isActive=true');
+            const res = await fetch('https://forlandservice.onrender.com/slider/?isActive=true');
             const data = await res.json();
 
             // Sort sliders by displayOrder
@@ -62,7 +62,7 @@ import { ParallaxProvider, ParallaxBanner } from 'react-scroll-parallax';
         const fetchVideos = async () => {
           setVideosLoading(true);
           try {
-            const res = await fetch('http://localhost:5050/youtube/?isActive=true');
+            const res = await fetch('https://forlandservice.onrender.com/youtube/?isActive=true');
             const data = await res.json();
 
             // Sort videos by displayOrder
