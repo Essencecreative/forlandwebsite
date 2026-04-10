@@ -196,7 +196,7 @@ const ContactUs = () => {
 
                     <div className="row" style={{ marginBottom: '20px' }}>
                       <div className="col-lg-6">
-                        <select className="form-control" name="gender" value={formData.gender} onChange={handleChange} style={{ height: '60px', color: formData.gender === '' ? '#a9a9a9' : '#495057' }} required>
+                        <select className="form-control" name="gender" value={formData.gender} onChange={handleChange} style={{ height: '53.4px', color: formData.gender === '' ? '#a9a9a9' : '#495057' }} required>
                           <option value="" disabled>{t.genderLabel}</option>
                           <option value="Male">Male / Mwanaume</option>
                           <option value="Female">Female / Mwanamke</option>
@@ -210,7 +210,7 @@ const ContactUs = () => {
 
                     <div className="row">
                        <div className="col-lg-6">
-                        <select className="form-control" name="category" value={formData.category} onChange={handleChange} style={{ height: '60px', color: formData.category === '' ? '#a9a9a9' : '#495057' }} required>
+                        <select className="form-control" name="category" value={formData.category} onChange={handleChange} style={{ height: '53.4px', color: formData.category === '' ? '#a9a9a9' : '#495057' }} required>
                           <option value="" disabled>{t.categoryLabel}</option>
                           <option value="General Inquiry">{t.categoryGeneral}</option>
                           <option value="Feedback">{t.categoryFeedback}</option>
