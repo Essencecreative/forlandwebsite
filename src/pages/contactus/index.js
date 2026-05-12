@@ -133,21 +133,7 @@ const ContactUs = () => {
             <div className="row">
               <div className="col-lg-8 mx-auto">
                 <div className="get-in-touch-cont text-center">
-                  {/* Language Toggle */}
-                  <div style={{ marginBottom: '20px', display: 'flex', justifyContent: 'center', gap: '10px' }}>
-                    <button 
-                      onClick={() => setLang('sw')} 
-                      style={{ padding: '5px 15px', border: '1px solid #ccc', background: lang === 'sw' ? '#00e676' : '#fff', color: lang === 'sw' ? '#fff' : '#333', borderRadius: '4px', cursor: 'pointer' }}
-                    >
-                      Swahili
-                    </button>
-                    <button 
-                      onClick={() => setLang('en')} 
-                      style={{ padding: '5px 15px', border: '1px solid #ccc', background: lang === 'en' ? '#00e676' : '#fff', color: lang === 'en' ? '#fff' : '#333', borderRadius: '4px', cursor: 'pointer' }}
-                    >
-                      English
-                    </button>
-                  </div>
+
 
                   <h3><span className="light-text">{t.pageTitle.split(' ')[0]}</span> {t.pageTitle.substring(t.pageTitle.indexOf(' ') + 1)}</h3>
                   <p>{t.subtitle}</p>

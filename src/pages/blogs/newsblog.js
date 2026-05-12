@@ -30,8 +30,13 @@ const NewsBlog = () => {
     fetchBlogData();
   }, [id]);
 
-  const renderMarkdownContent = (markdown) => {
-    return { __html: marked(markdown) };
+  const renderBlogContent = (content = '') => {
+    const trimmed = content.trim();
+    const looksLikeHtml = /<\/?[a-z][\s\S]*>/i.test(trimmed);
+
+    return {
+      __html: looksLikeHtml ? trimmed : marked(trimmed),
+    };
   };
 
   if (loading) {
@@ -115,10 +120,9 @@ const NewsBlog = () => {
               <div className={blogData?.documentUrl ? "col-lg-8" : "col-lg-12"}>
                 <div className="blog-content-item single-blog-details">
                   <div className="single-blog-item">
-                    {/* Render Markdown content */}
                     <div
                       className="blog-content"
-                      dangerouslySetInnerHTML={renderMarkdownContent(blogData.contentDescription)}
+                      dangerouslySetInnerHTML={renderBlogContent(blogData.contentDescription)}
                     />
                   </div>
                 </div>
@@ -159,6 +163,33 @@ const NewsBlog = () => {
           </div>
         </section>
       </div>
+      <style>
+        {`
+          .blog-content img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 8px;
+            margin: 1rem 0;
+          }
+          .blog-content p {
+            margin-bottom: 1rem;
+          }
+          .blog-content h1, .blog-content h2, .blog-content h3, .blog-content h4 {
+            margin-top: 1.25rem;
+            margin-bottom: 0.75rem;
+          }
+          .blog-content ul, .blog-content ol {
+            padding-left: 1.25rem;
+            margin-bottom: 1rem;
+          }
+          .blog-content blockquote {
+            border-left: 3px solid #006838;
+            padding-left: 1rem;
+            margin: 1rem 0;
+            color: #555;
+          }
+        `}
+      </style>
     </Layout>
   );
 };
