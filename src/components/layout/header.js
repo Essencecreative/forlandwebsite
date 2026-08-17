@@ -141,6 +141,7 @@ const Header = () => {
                         <li><a href="/forland/forms-and-guidelines">Forms and Guidelines</a></li>
                         <li><a href="/forland/brochure-and-newsletters">⁠Brochure & Newsletters</a></li>
                         <li><a href="/forland/institutional-support">Institutional Support</a></li>
+                        <li><a href="/forland/findings">Findings</a></li>
                       </ul>
                       </li>
                       </ul>

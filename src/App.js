@@ -36,6 +36,7 @@ import Blog from "./pages/blogs";
 import NewsBlog from "./pages/blogs/newsblog";
 import Callforproposal from "./pages/callforproposal";
 import Jobvacancies from "./pages/jobvacancies";
+import Findings from "./pages/findings";
 
 function App() {
   return (
@@ -85,6 +86,8 @@ function App() {
     <Route path="/forvac-administrative-and-management-reports/:id" element={<Blog />} />
     <Route path="/forland/institutional-support" element={<InstitutionalSupportReport />} />
     <Route path="/forland/institutional-support/:id" element={<Blog />} />
+    <Route path="/forland/findings" element={<Findings />} />
+    <Route path="/forland/findings/:id" element={<Blog />} />
     <Route path="/institutional-support" element={<InstitutionalSupportNews />} />
     <Route path="/institutional-support/:id" element={<NewsBlog />} />
   </Routes>
